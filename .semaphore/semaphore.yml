@@ -1,0 +1,96 @@
+# This pipeline is the entry point of Semaphore.
+
+# Use the latest stable version of Semaphore 2.0 YML syntax:
+version: v1.0
+
+# Name of your pipeline. In this example we connect multiple pipelines with
+# promotions, so it helps to differentiate what's the job of each.
+name: CI
+
+# An agent defines the environment in which your code runs.
+# It is a combination of one of available machine types and operating
+# system images. See:
+# https://docs.semaphoreci.com/article/20-machine-types
+# https://docs.semaphoreci.com/article/32-ubuntu-1804-image
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+
+# Blocks are the heart of a pipeline and are executed sequentially.
+# Each block has a task that defines one or more jobs. Jobs define the
+# commands to execute.
+# See https://docs.semaphoreci.com/article/62-concepts
+blocks:
+  - name: Install dependencies
+    task:
+      jobs:
+        - name: npm install
+          commands:
+            # Checkout code from Git repository. This step is mandatory if the
+            # job is to work with your code.
+            # Optionally you may use --use-cache flag to avoid roundtrip to
+            # remote repository.
+            # See https://docs.semaphoreci.com/article/54-toolbox-reference#libcheckout
+            - checkout
+
+            # Switch the node version
+            # More on JavaScript and Node.js: 
+            # https://docs.semaphoreci.com/article/82-language-javascript-and-nodejs
+            - nvm use
+            - node -v
+
+            # Restore dependencies from cache, command won't fail if it's
+            # missing.
+            # More on caching: https://docs.semaphoreci.com/article/54-toolbox-reference#cache
+            - cache restore
+            - npm install
+            # Store the latest version of dependencies in cache,
+            # to be used in next blocks and future workflows:
+            - cache store
+
+  - name: Run tests
+    task:
+      prologue:
+        commands:
+          # Checkout code from Git repository. This step is mandatory if the
+          # job is to work with your code.
+          # Optionally you may use --use-cache flag to avoid roundtrip to
+          # remote repository.
+          # See https://docs.semaphoreci.com/article/54-toolbox-reference#libcheckout
+          - checkout
+
+          # Restore dependencies from cache, command won't fail if it's
+          # missing.
+          # More on caching: https://docs.semaphoreci.com/article/54-toolbox-reference#cache
+          - cache restore
+
+          # Switch the node version
+          # More on JavaScript and Node.js: https://docs.semaphoreci.com/article/82-language-javascript-and-nodejs
+          - nvm use
+          - node -v
+
+      jobs:
+        # Run code analysis with jshint
+        - name: Lint
+          commands:
+            - npm run lint
+
+        # Run unit tests with cloudworker
+        - name: Unit tests
+          commands:
+            - npm test
+
+# If all tests pass, we move on to deployment
+# This is a job for a separate pipeline which we link with a promotion.
+# In this example we deploy the function to Cloudlare automatically for every
+# update on the master branch.
+# For more information, see:
+# https://docs.semaphoreci.com/article/50-pipeline-yaml#promotions
+promotions:
+  - name: Deploy
+    pipeline_file: deploy.yml
+    auto_promote_on:
+      - result: passed
+        branch:
+          - master
