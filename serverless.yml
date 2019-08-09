@@ -1,0 +1,23 @@
+service:
+  name: semaphore-demo-javascript-serverless
+  config:
+    accountId: $CLOUDFLARE_ACCOUNT_ID
+    zoneId: $CLOUDFLARE_ZONE_ID
+
+provider:
+  name: cloudflare
+  stage: prod
+
+plugins:
+  - serverless-cloudflare-workers
+
+functions:
+  hello:
+    name: hello
+    worker: hello
+    script: hello
+    webpack: false
+    events:
+      - http:
+          url: example.com/hello
+          method: GET

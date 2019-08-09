@@ -1,0 +1,47 @@
+# This pipeline runs after semaphore.yml
+version: v1.0
+name: Deploy to Cloudflare
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Deploy
+    task:
+      # Import the secret with you CloudFlare keys
+      # For info on creating secrets, see:
+      # https://docs.semaphoreci.com/article/66-environment-variables-and-secrets
+      secrets:
+        - name: cloudflare
+
+      prologue:
+        commands:
+          # Checkout code from Git repository. This step is mandatory if the
+          # job is to work with your code.
+          # Optionally you may use --use-cache flag to avoid roundtrip to
+          # remote repository.
+          # See https://docs.semaphoreci.com/article/54-toolbox-reference#libcheckout
+          - checkout
+
+          # Restore dependencies from cache, command won't fail if it's
+          # missing.
+          # More on caching: https://docs.semaphoreci.com/article/54-toolbox-reference#cache
+          - cache restore
+
+          # Switch the node version
+          # More on JavaScript and Node.js: 
+          # https://docs.semaphoreci.com/article/82-language-javascript-and-nodejs
+          - nvm use
+          - node -v
+
+      jobs:
+        - name: Deploy to Cloudflare
+          commands:
+            # Replace variables in serverless.yml
+            - cat serverless.yml | envsubst | tee serverless.yml
+
+            # Perform deployment with serverless
+            - npm run deploy
+
+            # Invoke function from Cloudflare
+            - npm run hello
