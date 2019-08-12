@@ -8,6 +8,6 @@ describe('Worker Test', function() {
         var ws = new Cloudworker(workerScript);
         var res = await ws.dispatch(req);
         var body = await res.text();
-        assert.equal(body,'Hello World! 2');
+        assert.equal(body,'Hello World!');
     });
 });
