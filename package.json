@@ -9,13 +9,13 @@
   "scripts": {
     "test": "mocha",
     "lint": "jshint *.js test/*.js",
-    "deploy": "sls deploy",
-    "hello": "sls invoke -f hello",
-    "remove": "sls remove"
+    "deploy": "serverless deploy",
+    "hello": "serverless invoke -f hello",
+    "remove": "serverless remove"
   },
   "repository": {
     "type": "git",
-    "url": "TBD"
+    "url": "https://github.com/semaphoreci-demos/semaphore-demo-cloudflare-workers.git"
   },
   "keywords": [
     "serverless",
