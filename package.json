@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "form-data": "^2.5.0",
-    "serverless": "^1.49.0",
+    "serverless": "^3.25.1",
     "serverless-cloudflare-workers": "^1.2.0"
   }
 }
