@@ -26,11 +26,11 @@
   "devDependencies": {
     "@dollarshaveclub/cloudworker": "^0.1.1",
     "jshint": "^2.10.2",
-    "mocha": "^6.2.0"
+    "mocha": "^10.2.0"
   },
   "dependencies": {
     "form-data": "^2.5.0",
-    "serverless": "^1.49.0",
+    "serverless": "^1.83.3",
     "serverless-cloudflare-workers": "^1.2.0"
   }
 }
